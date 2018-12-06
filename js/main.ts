@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { WorldScene } from "./worldScene";
+import { WorldModel } from "./models/WorldModel";
 
 // Force full reload on parcel hot module swap
 if ((<any>module).hot) {
@@ -21,45 +23,22 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
-var light = new THREE.HemisphereLight(0xffffff, 0x444444)
-light.position.set(0, 20, 0)
-scene.add(light)
+var world = new WorldScene(
+    scene,
+    camera
+);
 
-var dlight = new THREE.DirectionalLight(0xffffff)
-dlight.position.set(0, 20, 10)
-dlight.castShadow = true
-scene.add(dlight)
+world.setDevEnvironment();
 
-var mesh = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(2000, 2000),
-    new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false })
-)
-mesh.receiveShadow = true
-mesh.rotation.x = -Math.PI / 2
-scene.add(mesh)
-
-var grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000)
-if (grid.material instanceof THREE.Material) {
-    grid.material.opacity = 0.2
-    grid.material.transparent = true
-}
-scene.add(grid)
-
-var geometry = new THREE.BoxGeometry(1, 1, 1);
-var material = new THREE.MeshPhongMaterial({ color: 0x0000FF });
-var cube = new THREE.Mesh(geometry, material);
-cube.position.set(0, 2, 0)
-cube.castShadow = true
-cube.receiveShadow = true
-scene.add(cube);
+let model = new WorldModel(scene);
+world.addUpdate(model.update());
 
 camera.position.z = 5;
 
 function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x += 0.01
-    cube.rotation.y += 0.01
+    world.draw();
 
     renderer.render(scene, camera);
 }
