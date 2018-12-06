@@ -1,8 +1,8 @@
 import * as THREE from "three";
 
 // Force full reload on parcel hot module swap
-if (module.hot) {
-    module.hot.dispose(() => window.location.reload())
+if ((<any>module).hot) {
+    (<any>module).hot.dispose(() => window.location.reload())
 }
 
 
