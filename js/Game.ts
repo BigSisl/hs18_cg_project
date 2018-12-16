@@ -1,7 +1,11 @@
 import * as THREE from "three";
 import { WorldScene } from "./worldScene";
 import { WorldModel } from "./models/WorldModel";
+import { OrbitControls } from "./lib/OrbitControls";
 
+"use strict"
+
+var THREE2 = require("three");
 
 export class Game {
 
@@ -9,14 +13,21 @@ export class Game {
     scene;
     world: WorldScene;
     renderer: THREE.Renderer;
+    orbitControls: OrbitControls;
 
     constructor() {
-
         this.scene = this.setupScene();
         this.camera = this.setupCamera();
 
+        console.log(this.camera instanceof THREE2.PerspectiveCamera)
+        console.log(this.camera instanceof THREE.PerspectiveCamera)
+
         this.renderer = this.setupRenderer();
         document.body.appendChild(this.renderer.domElement);
+
+        this.orbitControls = new OrbitControls( this.camera, this.renderer.domElement);
+
+//        this.setupOrbitControls(this.camera, this.renderer);
 
         this.world = new WorldScene(
             this.scene,
@@ -29,6 +40,18 @@ export class Game {
         this.world.addUpdate(model.update());
 
         this.camera.position.z = 5;
+    }
+
+    setupOrbitControls(camera: THREE.Camera, render: THREE.Renderer): THREE.OrbitControls {
+        let controls = new OrbitControls(camera);
+
+        controls.screenSpacePanning = false;
+        controls.minDistance = 100;
+        controls.maxDistance = 500;
+
+        controls.maxPolarAngle = Math.PI / 2;
+
+        return controls;
     }
 
     setupScene(): THREE.Scene {
@@ -61,6 +84,8 @@ export class Game {
             requestAnimationFrame(animate);
 
             self.world.draw();
+
+            self.orbitControls.update();
 
             self.renderer.render(self.scene, self.camera);
         }

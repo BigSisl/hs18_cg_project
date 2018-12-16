@@ -1,8 +1,8 @@
+import { Object3D } from "three";
 
+export class GridElement {
 
-class GridElement {
-    
-    constructor(private scene: Scene) {
-        
+    constructor(private parent: Object3D, private file: String) {
+
     }
 }
