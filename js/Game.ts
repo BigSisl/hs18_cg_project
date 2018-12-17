@@ -26,6 +26,7 @@ export class Game {
         this.world.setDevEnvironment();
 
         let model = new WorldModel(this.scene);
+        model.loadTexture()
         this.world.addUpdate(model.update());
 
         this.camera.position.z = 5;
