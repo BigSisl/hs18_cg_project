@@ -1,6 +1,3 @@
-import * as THREE from "three";
-import { WorldScene } from "./worldScene";
-import { WorldModel } from "./models/WorldModel";
 import { Game } from "./Game";
 import { WEBGL } from "./lib/WebGL"
 

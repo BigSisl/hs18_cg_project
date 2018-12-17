@@ -1,18 +1,17 @@
-import { Scene, Mesh, MeshPhongMaterial, BoxGeometry } from "three";
+import { Scene, Mesh, MeshPhongMaterial, BoxGeometry, SphereGeometry } from "three";
 
 export class WorldModel {
 
     private cube: Mesh;
-
     constructor(private scene: Scene) {
-        var geometry = new BoxGeometry(1, 1, 1);
+        var geometry = new SphereGeometry(15, 32, 32);
         var material = new MeshPhongMaterial({ color: 0x0000FF });
-        var cube = new Mesh(geometry, material);
-        cube.position.set(0, 2, 0)
-        cube.castShadow = true
-        cube.receiveShadow = true
-        scene.add(cube);
-        this.cube = cube;
+        var sphere = new Mesh(geometry, material);
+        sphere.position.set(0, 0, 0)
+        sphere.castShadow = true
+        sphere.receiveShadow = true
+        scene.add(sphere);
+        this.cube = sphere;
     }
 
     update() {

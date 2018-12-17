@@ -1,12 +1,12 @@
 import * as THREE from "three";
 import { WorldScene } from "./worldScene";
 import { WorldModel } from "./models/WorldModel";
-
+import "./lib/OrbitControls";
 
 export class Game {
 
     camera: THREE.Camera;
-    scene;
+    scene: THREE.Scene;
     world: WorldScene;
     renderer: THREE.Renderer;
 
@@ -39,8 +39,12 @@ export class Game {
 
     setupCamera(): THREE.Camera {
         var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(-5, 3, 5)
+        camera.position.set(-50, 30, 5)
         camera.lookAt(0, 0, 0)
+
+        var controls = new THREE.OrbitControls(camera)
+        controls.enablePan = false
+
         return camera;
     }
 
