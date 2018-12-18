@@ -3,6 +3,7 @@ import { WorldScene } from "./worldScene";
 import { SimpleWorldModel } from "./models/SimpleWorldModel";
 import { OrbitControls } from "./lib/OrbitControls";
 import { WorldModel } from "./models/WorldModel";
+import { WorldCustomShader } from "./models/WorldCustomShader";
 
 export class Game {
 
@@ -30,7 +31,7 @@ export class Game {
 
         this.world.setDevEnvironment();
 
-        this.load(new SimpleWorldModel(this.scene));
+        this.load(new WorldCustomShader(this.scene));
 
         this.camera.position.z = 5;
     }
