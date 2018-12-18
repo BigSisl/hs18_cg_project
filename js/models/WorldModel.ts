@@ -1,25 +1,33 @@
-import { Scene, Mesh, MeshPhongMaterial, BoxGeometry } from "three";
+import * as THREE from "three";
+import texture from "../../resources/gen/world_satellite.png";
 
 export class WorldModel {
 
-    private cube: Mesh;
+    private sphere: THREE.Mesh;
 
-    constructor(private scene: Scene) {
-        var geometry = new BoxGeometry(1, 1, 1);
-        var material = new MeshPhongMaterial({ color: 0x0000FF });
-        var cube = new Mesh(geometry, material);
-        cube.position.set(0, 2, 0)
-        cube.castShadow = true
-        cube.receiveShadow = true
-        scene.add(cube);
-        this.cube = cube;
+    constructor(scene: THREE.Scene) {
+        var geometry = new THREE.SphereGeometry(15, 32, 32);
+        var material = new THREE.MeshPhongMaterial({ color: 0x0000FF });
+        this.sphere = new THREE.Mesh(geometry, material);
+
+        this.sphere.position.set(0, 0, 0)
+        this.sphere.castShadow = true
+        this.sphere.receiveShadow = true
+        scene.add(this.sphere);
+    }
+
+    loadTexture() {
+        const loader = new THREE.TextureLoader()
+        loader.load(texture, tex => {
+            var material = new THREE.MeshPhongMaterial({ map: tex });
+            this.sphere.material = material
+        })
     }
 
     update() {
         var self = this;
-        return (delta: number) => {
-            self.cube.rotation.x += 0.01
-            self.cube.rotation.y += 0.01
+        return () => {
+            self.sphere.rotation.y += 0.01
         }
     }
 

@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { Game } from "./Game";
 import { WEBGL } from "./lib/WebGL"
-import * as THREE from "three";
 
 // Force full reload on parcel hot module swap
 if ((<any>module).hot) {
