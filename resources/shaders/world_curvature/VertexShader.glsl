@@ -10,6 +10,10 @@
 #include <skinning_pars_vertex>
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
+
+uniform vec3 uMappingPos;
+uniform float uCurvature;
+
 void main() {
 	#include <uv_vertex>
 	#include <uv2_vertex>
@@ -24,7 +28,24 @@ void main() {
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
-	#include <project_vertex>
+
+	//transformed = vec3 ( 0, transformed.y, transformed.z );
+	vec3 mappingPos = normalize(uMappingPos) * length(transformed);
+	vec3 nTransformed = normalize(transformed);
+	vec3 nMappingPos = normalize(mappingPos);
+	vec3 nPlaneMappingPos = normalize(vec3(0.0,0.0,0.0) - mappingPos);
+	float rad = acos(dot(nMappingPos, nTransformed));
+	float deg = degrees(rad);
+
+	float sphereViewable = 10.0 * (1.0 - uCurvature);
+	if(deg < 80.0 + sphereViewable || deg > 280.0 - sphereViewable) {
+		float t = (dot(nPlaneMappingPos, mappingPos) - dot(nPlaneMappingPos, transformed)) / dot(nPlaneMappingPos, nTransformed);
+		transformed += nTransformed * t * uCurvature;
+	}
+
+	vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
+	gl_Position = projectionMatrix * mvPosition;
+
 	#include <logdepthbuf_vertex>
 	#include <worldpos_vertex>
 	#include <clipping_planes_vertex>

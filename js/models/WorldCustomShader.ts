@@ -11,6 +11,9 @@ import * as THREE from "three";
  */
 export class WorldCustomShader implements WorldModel {
 
+    private mappingPos = new THREE.Vector3( 1, 0, 0 );
+    private curvature = 0.0;
+
     private sphere: THREE.Mesh;
     private material: THREE.ShaderMaterial;
 
@@ -28,11 +31,21 @@ export class WorldCustomShader implements WorldModel {
     }
 
     load() {
-        this.loadTexture()
+        if(this.material == null) {
+            this.loadTexture()
+        }
     }
 
     unload() {
 
+    }
+
+    setCurvature(curvature: number) {
+        this.material.uniforms['uCurvature'].value = curvature;
+    }
+
+    getCurvature() {
+        return this.material.uniforms['uCurvature'].value;
     }
 
     loadTexture() {
@@ -41,6 +54,9 @@ export class WorldCustomShader implements WorldModel {
             const basic = THREE.UniformsUtils.clone(THREE.ShaderLib['phong']);
             basic.uniforms.map.value = tex
             basic.uniforms.color = new THREE.Color( 0x00ffff );
+
+            basic.uniforms['uCurvature'] = { value: this.curvature };
+            basic.uniforms['uMappingPos'] = { value: this.mappingPos };
 
             const shader = new THREE.ShaderMaterial({
                 vertexShader: vertexShader,
@@ -52,11 +68,23 @@ export class WorldCustomShader implements WorldModel {
         })
     }
 
-    update() {
+    update = (() => {
         var self = this;
+        var maximize = true;
         return (delta) => {
-            self.sphere.rotation.y += 0.01 * delta
+           // self.sphere.rotation.y += 0.1 * delta
+
+            let curvature = self.getCurvature();
+            curvature += 0.1 * delta * (maximize ? 1 : -1);
+            if(curvature >= 1.0) {
+                curvature = 1.0;
+                maximize = false;
+            } else if(curvature <= 0.0) {
+                curvature = 0.0;
+                maximize = true;
+            }
+            self.setCurvature(curvature);
         }
-    }
+    })();
 
 }
