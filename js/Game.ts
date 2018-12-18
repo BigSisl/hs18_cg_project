@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { WorldScene } from "./worldScene";
-import { WorldModel } from "./models/WorldModel";
+import { SimpleWorldModel } from "./models/SimpleWorldModel";
 import { OrbitControls } from "./lib/OrbitControls";
+import { WorldModel } from "./models/WorldModel";
 
 export class Game {
 
@@ -10,6 +11,8 @@ export class Game {
     world: WorldScene;
     renderer: THREE.Renderer;
     orbitControls: OrbitControls;
+
+    activeWorld: WorldModel = null;
 
     constructor() {
         this.scene = this.setupScene();
@@ -27,11 +30,22 @@ export class Game {
 
         this.world.setDevEnvironment();
 
-        let model = new WorldModel(this.scene);
-        model.loadTexture()
-        this.world.addUpdate(model.update());
+        this.load(new SimpleWorldModel(this.scene));
 
         this.camera.position.z = 5;
+    }
+
+    load(world: WorldModel) {
+        if(this.activeWorld != null) {
+            this.world.removeUpdate(world.update);
+        }
+
+        world.load()
+        this.world.addUpdate(world.update);
+    }
+
+    insertShaderWorld() {
+
     }
 
     setupOrbitControls(camera: THREE.Camera, render: THREE.Renderer): OrbitControls {
