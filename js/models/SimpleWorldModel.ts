@@ -39,7 +39,7 @@ export class SimpleWorldModel implements WorldModel {
     update = (() => {
         var self = this;
         return (delta) => {
-            self.sphere.rotation.y += 0.01 * delta
+            self.sphere.rotation.y += 0.001 * delta
         }
     })();
 

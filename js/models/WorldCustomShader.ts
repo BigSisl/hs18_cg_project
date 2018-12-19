@@ -72,9 +72,9 @@ export class WorldCustomShader implements WorldModel {
         var self = this;
         var maximize = true;
         return (delta) => {
-           // self.sphere.rotation.y += 0.1 * delta
+            self.sphere.rotation.y += 0.01 * delta
 
-            let curvature = self.getCurvature();
+           /* let curvature = self.getCurvature();
             curvature += 0.1 * delta * (maximize ? 1 : -1);
             if(curvature >= 1.0) {
                 curvature = 1.0;
@@ -82,8 +82,8 @@ export class WorldCustomShader implements WorldModel {
             } else if(curvature <= 0.0) {
                 curvature = 0.0;
                 maximize = true;
-            }
-            self.setCurvature(curvature);
+            } */
+            self.setCurvature(0.0);
         }
     })();
 

@@ -7,9 +7,13 @@ if ((<any>module).hot) {
     (<any>module).hot.dispose(() => window.location.reload())
 }
 
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-5, 3, 5)
-camera.lookAt(0, 0, 0);
+
+var SCREEN_WIDTH = window.innerWidth;
+var SCREEN_HEIGHT = window.innerHeight;
+
+var debugCamera = new THREE.PerspectiveCamera(75, SCREEN_WIDTH / SCREEN_HEIGHT, 0.1, 1000);
+debugCamera.position.set(-5, 3, 5)
+debugCamera.lookAt(0, 0, 0);
 
 
 if(WEBGL.isWebGLAvailable()) {
