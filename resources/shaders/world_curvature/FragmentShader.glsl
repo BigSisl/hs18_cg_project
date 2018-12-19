@@ -19,13 +19,39 @@ uniform float opacity;
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
+uniform mat4 uLookAtMatrix;
+uniform vec3 uMappingPos;
+varying vec3 vtransformed;
+
 void main() {
 	#include <clipping_planes_fragment>
 
 	vec4 diffuseColor = vec4( diffuse, opacity );
 
 	#include <logdepthbuf_fragment>
-	#include <map_fragment>
+
+	// calculate offset from lookAt rotation
+	vec3 yNMappingPos = uMappingPos;
+	vec3 yNTransformed = vec3(0.0,0.0,1.0);
+	yNMappingPos.y = 0.0;
+	yNTransformed.y = 0.0;
+	float rad = acos(dot(normalize(yNTransformed), normalize(yNMappingPos)));
+	float deg = degrees(rad);
+
+	float xRot = mod(atan(uLookAtMatrix[2][3], uLookAtMatrix[3][3]), PI2);
+	float yRot2 = mod(atan(-uLookAtMatrix[3][1], sqrt(exp2(uLookAtMatrix[3][2]) + exp2(uLookAtMatrix[3][3]))), PI2);
+	float zRot = mod(atan(uLookAtMatrix[2][1], uLookAtMatrix[1][1]), PI2);
+
+	vec2 offset = vec2(0.0, 0.0);
+
+	vec2 vUvO = mod(offset + vUv, 1.0);
+	// create mirrored version, so it finishes on all sides
+//	vUvO = abs(vUvO * 2.0 - 1.0);
+
+	vec4 texelColor = texture2D( map, vUvO );
+	texelColor = mapTexelToLinear( texelColor );
+	diffuseColor *= texelColor;
+
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>

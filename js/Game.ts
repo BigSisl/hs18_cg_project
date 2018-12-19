@@ -23,6 +23,8 @@ export class Game {
     activeWorld: WorldModel = null;
     activeCamera: THREE.Camera;
 
+    axis: THREE.AxesHelper = new THREE.AxesHelper(4);
+
     keys: { [K in KEYS]: any; } = {
         TOGGLE_CAMERA: 32
     };
@@ -41,14 +43,19 @@ export class Game {
             this.debugCamera
         );
 
-        this.worldCamera = new Camera(this.scene);
+        var planet = new WorldCustomShader(this.scene);
+
+        this.worldCamera = new Camera(this.scene, planet);
         this.world.addUpdate(this.worldCamera.update);
 
         this.world.setDevEnvironment();
 
-        this.load(new WorldCustomShader(this.scene));
+        this.load(planet);
 
         this.debugCamera.position.z = 5;
+
+        this.scene.add(this.axis);
+        this.axis.position.set(0, 20, 0);
 
         this.toggleCamera();
         this.setupListeners();
@@ -59,10 +66,12 @@ export class Game {
             this.worldCamera.disbale();
             this.debugOrbitControls.enabled = true;
             this.activeCamera = this.debugCamera;
+            this.axis.visible = true;
         } else {
             this.debugOrbitControls.enabled = false;
             this.worldCamera.active();
             this.activeCamera = this.worldCamera;
+            this.axis.visible = false;
         }
     }
 

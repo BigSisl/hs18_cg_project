@@ -12,7 +12,10 @@
 #include <clipping_planes_pars_vertex>
 
 uniform vec3 uMappingPos;
+uniform mat4 uLookAtMatrix;
 uniform float uCurvature;
+
+varying vec3 vtransformed;
 
 void main() {
 	#include <uv_vertex>
@@ -29,6 +32,9 @@ void main() {
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
 
+	//transform sphere to always look into camera direction
+	vtransformed = transformed;
+
 	//transformed = vec3 ( 0, transformed.y, transformed.z );
 	vec3 mappingPos = normalize(uMappingPos) * length(transformed);
 	vec3 nTransformed = normalize(transformed);
@@ -43,7 +49,7 @@ void main() {
 		transformed += nTransformed * t * uCurvature;
 	}
 
-	vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
+	vec4 mvPosition = modelViewMatrix * uLookAtMatrix * vec4( transformed, 1.0 );
 	gl_Position = projectionMatrix * mvPosition;
 
 	#include <logdepthbuf_vertex>

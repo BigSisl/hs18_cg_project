@@ -419,7 +419,7 @@ export class OrbitControls extends THREE.EventDispatcher {
     }
 
     public handleMouseMoveRotate( event ) {
-        console.log( 'handleMouseMoveRotate' );
+        // console.log( 'handleMouseMoveRotate' );
 
         this.rotateEnd.set( event.clientX, event.clientY );
 
@@ -437,7 +437,7 @@ export class OrbitControls extends THREE.EventDispatcher {
     }
 
     public handleMouseMoveDolly( event ) {
-        console.log( 'handleMouseMoveDolly' );
+        // console.log( 'handleMouseMoveDolly' );
 
         this.dollyEnd.set( event.clientX, event.clientY );
 
@@ -455,7 +455,7 @@ export class OrbitControls extends THREE.EventDispatcher {
     }
 
     public handleMouseMovePan( event ) {
-        console.log( 'handleMouseMovePan' );
+        // console.log( 'handleMouseMovePan' );
 
         this.panEnd.set( event.clientX, event.clientY );
 

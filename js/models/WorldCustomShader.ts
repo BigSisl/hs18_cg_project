@@ -3,6 +3,7 @@ import vertexShader from "../../resources/shaders/world_curvature/VertexShader.g
 import fragmentShader from "../../resources/shaders/world_curvature/FragmentShader.glsl";
 import { WorldModel } from "./WorldModel";
 import * as THREE from "three";
+import { Vector3 } from "three";
 
 /**
  * This version uses a custom shader with an
@@ -28,6 +29,16 @@ export class WorldCustomShader implements WorldModel {
         this.sphere.castShadow = true
         this.sphere.receiveShadow = true
         scene.add(this.sphere);
+        scene.add(this.addWireframe());
+    }
+
+    addWireframe() {
+        var wireframe = new THREE.WireframeGeometry( this.sphere.geometry );
+        var line = new THREE.LineSegments( wireframe );
+        line.material.depthTest = false;
+        line.material.opacity = 0.25;
+        line.material.transparent = true;
+        return line;
     }
 
     load() {
@@ -54,9 +65,11 @@ export class WorldCustomShader implements WorldModel {
             const basic = THREE.UniformsUtils.clone(THREE.ShaderLib['phong']);
             basic.uniforms.map.value = tex
             basic.uniforms.color = new THREE.Color( 0x00ffff );
+            basic.uniforms.wireframe = true;
 
             basic.uniforms['uCurvature'] = { value: this.curvature };
             basic.uniforms['uMappingPos'] = { value: this.mappingPos };
+            basic.uniforms['uLookAtMatrix'] = { value: new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, this.sphere.up) };
 
             const shader = new THREE.ShaderMaterial({
                 vertexShader: vertexShader,
@@ -68,11 +81,32 @@ export class WorldCustomShader implements WorldModel {
         })
     }
 
+    updateMappingPosition(mappingPos: THREE.Vector3) {
+        this.mappingPos.copy(mappingPos);
+//        this.mappingPos.y = 0;
+        this.material.uniforms['uLookAtMatrix'].value = new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, new Vector3(0,1,0));
+
+        var mapPos = mappingPos.clone();
+        mapPos.y = 0;
+
+        var mat4: THREE.Matrix4 = this.material.uniforms['uLookAtMatrix'].value;
+        var gradZ = THREE.Math.radToDeg(Math.atan2(mat4.elements[4], mat4.elements[0]));
+        var gradX = THREE.Math.radToDeg(Math.atan2(mat4.elements[9], mat4.elements[10]));
+        var gradY = THREE.Math.radToDeg(Math.atan2(-mat4.elements[8], Math.sqrt(mat4.elements[9]^2 + mat4.elements[10]^2)));
+      //   atan(-uLookAtMatrix[3][1], sqrt(exp2(uLookAtMatrix[3][2]) + exp2(uLookAtMatrix[3][3]))
+        console.log(gradX,  gradY, gradZ);
+
+//        console.log(mat4.elements);
+//        console.log();
+    }
+
     update = (() => {
         var self = this;
         var maximize = true;
         return (delta) => {
-            self.sphere.rotation.y += 0.01 * delta
+            self.sphere.rotation.y += 0.00 * delta
+
+
 
            /* let curvature = self.getCurvature();
             curvature += 0.1 * delta * (maximize ? 1 : -1);
