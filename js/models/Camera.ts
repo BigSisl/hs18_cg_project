@@ -18,7 +18,7 @@ export class Camera extends THREE.PerspectiveCamera {
 
     private cameraHelper: THREE.CameraHelper;
 
-    private maxDistance: number = 30.0;
+    private maxDistance: number = 40.0;
     private minDistance: number = 16.0;
     private curvatureChangeOn: MaxMin<number> = {
         max: 20,
@@ -35,7 +35,7 @@ export class Camera extends THREE.PerspectiveCamera {
     }
 
     constructor(private scene: THREE.Scene, private world: WorldCustomShader) {
-        super( 60, 1 * aspect, 1, 30 );
+        super( 60, 1 * aspect, 1, 100 );
 
         this.position.set(0, 0, this.maxDistance);
         this.lookAt(0.0,0.0,0.0);

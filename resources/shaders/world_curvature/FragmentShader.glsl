@@ -21,6 +21,9 @@ uniform float opacity;
 
 uniform mat4 uLookAtMatrix;
 uniform vec3 uMappingPos;
+uniform float yRotation;
+uniform float xzRotation;
+
 varying vec3 vtransformed;
 
 void main() {
@@ -42,9 +45,35 @@ void main() {
 	float yRot2 = mod(atan(-uLookAtMatrix[3][1], sqrt(exp2(uLookAtMatrix[3][2]) + exp2(uLookAtMatrix[3][3]))), PI2);
 	float zRot = mod(atan(uLookAtMatrix[2][1], uLookAtMatrix[1][1]), PI2);
 
-	vec2 offset = vec2(0.0, 0.0);
+	float yOffset = yRotation == 0.0 ? 0.0 : PI / yRotation;
 
-	vec2 vUvO = mod(offset + vUv, 1.0);
+	float rotWeigth = 1.0 - abs(yRotation / PI2);
+
+	vec2 offset = vec2(xzRotation / PI /* xzRotation / PI * rotWeigth */, yRotation / PI);
+	float mapRot = xzRotation;
+//	float mapRot = PI_HALF;
+
+	// create rotation matrix
+	mat3 rotMatrix = mat3(
+		vec3(cos(mapRot), -sin(mapRot), 0.0),
+		vec3(sin(mapRot), cos(mapRot), 0.0),
+		vec3(0.0,0.0,1.0)
+	);
+	mat3 transCenter = mat3(
+		vec3(1.0,0.0,-0.5),
+		vec3(0.0,1.0,-0.5),
+		vec3(0.0,0.0,1.0)
+	);
+	mat3 transCenterInv = mat3(
+		vec3(1.0,0.0,0.5),
+		vec3(0.0,1.0,0.5),
+		vec3(0.0,0.0,1.0)
+	);
+
+	vec3 hUvO = vec3(offset + vUv, 1.0);
+//	vec3 hUvO = transCenterInv * rotMatrix * transCenter * vec3(vUv, 1.0);
+	vec2 vUvO = vec2(mod(hUvO.x / hUvO.z, 1.0), mod(hUvO.y / hUvO.z, 1.0));
+
 	// create mirrored version, so it finishes on all sides
 //	vUvO = abs(vUvO * 2.0 - 1.0);
 

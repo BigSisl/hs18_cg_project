@@ -29,7 +29,7 @@ export class WorldCustomShader implements WorldModel {
         this.sphere.castShadow = true
         this.sphere.receiveShadow = true
         scene.add(this.sphere);
-        scene.add(this.addWireframe());
+//        scene.add(this.addWireframe());
     }
 
     addWireframe() {
@@ -70,6 +70,8 @@ export class WorldCustomShader implements WorldModel {
             basic.uniforms['uCurvature'] = { value: this.curvature };
             basic.uniforms['uMappingPos'] = { value: this.mappingPos };
             basic.uniforms['uLookAtMatrix'] = { value: new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, this.sphere.up) };
+            basic.uniforms['yRotation'] = { value: 0.0 };
+            basic.uniforms['xzRotation'] = { value: 0.0 };
 
             const shader = new THREE.ShaderMaterial({
                 vertexShader: vertexShader,
@@ -84,17 +86,47 @@ export class WorldCustomShader implements WorldModel {
     updateMappingPosition(mappingPos: THREE.Vector3) {
         this.mappingPos.copy(mappingPos);
 //        this.mappingPos.y = 0;
+
+
+
+        var quaternion = this.sphere.quaternion.clone();
+        quaternion
+
+        var xzPos = mappingPos.clone();
+        var mNormalized = mappingPos.clone().normalize();
+        xzPos.y = 0;
+        xzPos.normalize();
+
+        // Try using Quaternions
+        //var yQuaternion = new THREE.Quaternion();
+        //yQuaternion.setFromAxisAngle(xzPos, 0);
+        //var mappingQuaternion = new THREE.Quaternion();
+
+        // calculate rotation matrix, so sphere is looking at camera (prevent distortaion)
         this.material.uniforms['uLookAtMatrix'].value = new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, new Vector3(0,1,0));
 
-        var mapPos = mappingPos.clone();
-        mapPos.y = 0;
+        var xyRot = xzPos.angleTo(new THREE.Vector3(0,0,1));
+        if(xzPos.x < 0) {
+            xyRot *= -1;
+        }
 
-        var mat4: THREE.Matrix4 = this.material.uniforms['uLookAtMatrix'].value;
-        var gradZ = THREE.Math.radToDeg(Math.atan2(mat4.elements[4], mat4.elements[0]));
-        var gradX = THREE.Math.radToDeg(Math.atan2(mat4.elements[9], mat4.elements[10]));
-        var gradY = THREE.Math.radToDeg(Math.atan2(-mat4.elements[8], Math.sqrt(mat4.elements[9]^2 + mat4.elements[10]^2)));
+        var yRot = mNormalized.angleTo(xzPos);
+        if(xzPos.y > mNormalized.y) {
+            yRot *= -1;
+        }
+
+        this.material.uniforms['yRotation'].value = yRot;
+        this.material.uniforms['xzRotation'].value = xyRot;
+
+        console.log( THREE.Math.radToDeg(xyRot));
+
+        // try to recalculate euler orientation from mat4
+        //var mat4: THREE.Matrix4 = this.material.uniforms['uLookAtMatrix'].value;
+        //var gradZ = THREE.Math.radToDeg(Math.atan2(mat4.elements[4], mat4.elements[0]));
+        //var gradX = THREE.Math.radToDeg(Math.atan2(mat4.elements[9], mat4.elements[10]));
+        //var gradY = THREE.Math.radToDeg(Math.atan2(-mat4.elements[8], Math.sqrt(mat4.elements[9]^2 + mat4.elements[10]^2)));
       //   atan(-uLookAtMatrix[3][1], sqrt(exp2(uLookAtMatrix[3][2]) + exp2(uLookAtMatrix[3][3]))
-        console.log(gradX,  gradY, gradZ);
+      //  console.log(gradX,  gradY, gradZ);
 
 //        console.log(mat4.elements);
 //        console.log();
