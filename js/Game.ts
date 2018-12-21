@@ -5,7 +5,7 @@ import { OrbitControls } from "./lib/OrbitControls";
 import { WorldModel } from "./models/WorldModel";
 import { WorldCustomShader } from "./models/WorldCustomShader";
 import { Camera } from "./models/Camera";
-import { WorldCustomShaderV1 } from "./models/WorldCustomShaderv1";
+import { WorldCustomShaderV1 } from "./models/WorldCustomShaderV1";
 
 type KEYS =
     'TOGGLE_CAMERA';
