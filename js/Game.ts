@@ -5,10 +5,10 @@ import { OrbitControls } from "./lib/OrbitControls";
 import { WorldModel } from "./models/WorldModel";
 import { WorldCustomShader } from "./models/WorldCustomShader";
 import { Camera } from "./models/Camera";
+import { WorldCustomShaderV1 } from "./models/WorldCustomShaderv1";
 
 type KEYS =
     'TOGGLE_CAMERA';
-
 
 export class Game {
 
@@ -26,8 +26,10 @@ export class Game {
     axis: THREE.AxesHelper = new THREE.AxesHelper(4);
 
     keys: { [K in KEYS]: any; } = {
-        TOGGLE_CAMERA: 32
+        TOGGLE_CAMERA: 32,
     };
+
+    worlds: Map<number, WorldModel> = new Map();
 
     constructor() {
         this.scene = this.setupScene();
@@ -41,16 +43,19 @@ export class Game {
         this.world = new WorldScene(
             this.scene,
             this.debugCamera
+
         );
 
-        var planet = new WorldCustomShader(this.scene);
-
-        this.worldCamera = new Camera(this.scene, planet);
+        this.worldCamera = new Camera(this.scene, null);
         this.world.addUpdate(this.worldCamera.update);
+
+        this.worlds.set(0x31, new SimpleWorldModel(this.scene));
+        this.worlds.set(0x32, new WorldCustomShaderV1(this.scene, this.worldCamera));
+        this.worlds.set(0x33, new WorldCustomShader(this.scene));
 
         this.world.setDevEnvironment();
 
-        this.load(planet);
+        this.load(this.worlds.entries().next().value[1]);
 
         this.debugCamera.position.z = 5;
 
@@ -81,10 +86,12 @@ export class Game {
 
     load(world: WorldModel) {
         if(this.activeWorld != null) {
+            this.activeWorld.unload();
             this.world.removeUpdate(world.update);
         }
 
-        world.load()
+        world.load();
+        this.activeWorld = world;
         this.world.addUpdate(world.update);
     }
 
@@ -142,12 +149,14 @@ export class Game {
     onKeyDown = (() => {
         var self = this;
         return (event: KeyboardEvent): any => {
-            console.log(event.keyCode);
-
             switch(event.keyCode) {
                 case self.keys.TOGGLE_CAMERA:
                     self.toggleCamera();
                     break;
+            }
+
+            if(self.worlds.has(event.keyCode)) {
+                self.load(self.worlds.get(event.keyCode));
             }
         }
     })();

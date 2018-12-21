@@ -1,16 +1,17 @@
 import texture from "../../resources/gen/world_satellite.png";
-import vertexShader from "../../resources/shaders/world_curvature/VertexShader.glsl";
-import fragmentShader from "../../resources/shaders/world_curvature/FragmentShader.glsl";
-import { WorldModel, UpdateableWorld } from "./WorldModel";
+import vertexShader from "../../resources/shaders/world_curvature/VertexShader.v1.glsl";
+import fragmentShader from "../../resources/shaders/world_curvature/FragmentShader.v1.glsl";
+import { WorldModel } from "./WorldModel";
 import * as THREE from "three";
 import { Vector3 } from "three";
+import { Camera } from "./Camera";
 
 /**
  * This version uses a custom shader with an
  * extra attriubte, defining, how the sphere surface
  * should flatten in the direction to the camera.
  */
-export class WorldCustomShader implements WorldModel, UpdateableWorld {
+export class WorldCustomShaderV1 implements WorldModel {
 
     private mappingPos = new THREE.Vector3( 1, 0, 0 );
     private curvature = 0.0;
@@ -18,7 +19,7 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
     private sphere: THREE.Mesh;
     private material: THREE.ShaderMaterial;
 
-    constructor(private scene: THREE.Scene) {
+    constructor(scene: THREE.Scene, private camera: Camera) {
         var geometry = new THREE.SphereGeometry(15, 32, 32);
 
         var material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
@@ -28,7 +29,7 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
         this.sphere.position.set(0, 0, 0)
         this.sphere.castShadow = true
         this.sphere.receiveShadow = true
-        this.sphere.visible = false;
+        this.sphere.visible = false
         scene.add(this.sphere);
 //        scene.add(this.addWireframe());
     }
@@ -46,10 +47,13 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
         if(this.material == null) {
             this.loadTexture()
         }
-        this.sphere.visible = true
+        this.sphere.visible = true;
+        this.camera.world = this;
     }
 
     unload() {
+        console.log("unload")
+        this.camera.world = null;
         this.sphere.visible = false;
     }
 

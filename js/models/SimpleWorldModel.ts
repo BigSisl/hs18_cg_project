@@ -7,7 +7,7 @@ export class SimpleWorldModel implements WorldModel {
     private sphere: THREE.Mesh;
     private material: THREE.MeshPhongMaterial;
 
-    constructor(scene: THREE.Scene) {
+    constructor(private scene: THREE.Scene) {
         var geometry = new THREE.SphereGeometry(15, 32, 32);
         var material = new THREE.MeshPhongMaterial({ color: 0x0000FF });
         this.sphere = new THREE.Mesh(geometry, material);
@@ -30,10 +30,11 @@ export class SimpleWorldModel implements WorldModel {
         if (this.material == null) {
             this.loadTexture();
         }
+        this.scene.add(this.sphere);
     }
 
     unload() {
-
+        this.scene.remove(this.sphere);
     }
 
     update = (() => {

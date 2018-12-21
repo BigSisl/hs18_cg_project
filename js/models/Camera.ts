@@ -3,6 +3,7 @@ import { OrbitControls } from "../lib/OrbitControls";
 import { TlsOptions } from "tls";
 import { WorldCustomShader } from "./WorldCustomShader";
 import { Object3D, Vector3 } from "three";
+import { WorldModel, UpdateableWorld } from "./WorldModel";
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -34,7 +35,7 @@ export class Camera extends THREE.PerspectiveCamera {
         min: 0.1
     }
 
-    constructor(private scene: THREE.Scene, private world: WorldCustomShader) {
+    constructor(private scene: THREE.Scene, public world: UpdateableWorld) {
         super( 60, 1 * aspect, 1, 100 );
 
         this.position.set(0, 0, this.maxDistance);
@@ -50,9 +51,6 @@ export class Camera extends THREE.PerspectiveCamera {
 
         this.scene.add(this);
         this.scene.add(this.cameraHelper);
-
-        console.log(this.matrixWorld.elements);
-
     }
 
     public active() {
@@ -104,7 +102,9 @@ export class Camera extends THREE.PerspectiveCamera {
             self.controls.zoomSpeed =
                 ((self.distance - self.minDistance) / (self.maxDistance - self.minDistance) * (self.speed.max - self.speed.min))
                 + self.speed.min;
-            self.world.updateMappingPosition(self.position);
+            if (self.world != null) {
+                self.world.updateMappingPosition(self.position);
+            }
 
             var rotationMatrix = new THREE.Matrix4();
             rotationMatrix.makeRotationAxis(new Vector3(0,1,0).normalize(), rad * delta );
