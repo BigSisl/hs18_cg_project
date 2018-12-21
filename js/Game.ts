@@ -51,11 +51,11 @@ export class Game {
 
         this.worlds.set(0x31, new SimpleWorldModel(this.scene));
         this.worlds.set(0x32, new WorldCustomShaderV1(this.scene, this.worldCamera));
-        this.worlds.set(0x33, new WorldCustomShader(this.scene));
+        this.worlds.set(0x33, new WorldCustomShader(this.scene, this.worldCamera));
 
         this.world.setDevEnvironment();
 
-        this.load(this.worlds.entries().next().value[1]);
+        this.load(this.worlds.get(0x33));
 
         this.debugCamera.position.z = 5;
 
@@ -90,8 +90,8 @@ export class Game {
             this.world.removeUpdate(world.update);
         }
 
-        world.load();
         this.activeWorld = world;
+        world.load();
         this.world.addUpdate(world.update);
     }
 

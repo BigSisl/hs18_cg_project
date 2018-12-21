@@ -49,7 +49,7 @@ void main() {
 
 	float rotWeigth = 1.0 - abs(yRotation / PI2);
 
-	vec2 offset = vec2(xzRotation / PI /* xzRotation / PI * rotWeigth */, yRotation / PI);
+	vec2 offset = vec2(xzRotation / PI2 + 0.5 /* xzRotation / PI * rotWeigth */, yRotation / PI);
 	float mapRot = xzRotation;
 //	float mapRot = PI_HALF;
 

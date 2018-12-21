@@ -124,7 +124,7 @@ export class WorldCustomShaderV1 implements WorldModel {
         this.material.uniforms['yRotation'].value = yRot;
         this.material.uniforms['xzRotation'].value = xyRot;
 
-        console.log( THREE.Math.radToDeg(xyRot));
+        //console.log( THREE.Math.radToDeg(xyRot));
 
         // try to recalculate euler orientation from mat4
         //var mat4: THREE.Matrix4 = this.material.uniforms['uLookAtMatrix'].value;

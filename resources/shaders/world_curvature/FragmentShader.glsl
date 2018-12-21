@@ -23,6 +23,7 @@ uniform mat4 uLookAtMatrix;
 uniform vec3 uMappingPos;
 uniform float yRotation;
 uniform float xzRotation;
+uniform mat4 uLookAtMatrixYInv;
 
 varying vec3 vtransformed;
 

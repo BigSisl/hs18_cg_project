@@ -3,7 +3,8 @@ import vertexShader from "../../resources/shaders/world_curvature/VertexShader.g
 import fragmentShader from "../../resources/shaders/world_curvature/FragmentShader.glsl";
 import { WorldModel, UpdateableWorld } from "./WorldModel";
 import * as THREE from "three";
-import { Vector3 } from "three";
+import { Vector3, Matrix4 } from "three";
+import { Camera } from "./Camera";
 
 /**
  * This version uses a custom shader with an
@@ -18,7 +19,7 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
     private sphere: THREE.Mesh;
     private material: THREE.ShaderMaterial;
 
-    constructor(private scene: THREE.Scene) {
+    constructor(private scene: THREE.Scene, private camera: Camera) {
         var geometry = new THREE.SphereGeometry(15, 32, 32);
 
         var material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
@@ -72,6 +73,7 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
             basic.uniforms['uCurvature'] = { value: this.curvature };
             basic.uniforms['uMappingPos'] = { value: this.mappingPos };
             basic.uniforms['uLookAtMatrix'] = { value: new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, this.sphere.up) };
+            basic.uniforms['uLookAtMatrixYInv'] = { value: new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, this.sphere.up) };
             basic.uniforms['yRotation'] = { value: 0.0 };
             basic.uniforms['xzRotation'] = { value: 0.0 };
 
@@ -105,10 +107,15 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
         //var mappingQuaternion = new THREE.Quaternion();
 
         // calculate rotation matrix, so sphere is looking at camera (prevent distortaion)
-        this.material.uniforms['uLookAtMatrix'].value = new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, new Vector3(0,1,0));
+        var matLookAt = new THREE.Matrix4().lookAt(this.sphere.position, this.mappingPos, new Vector3(0,1,0));
+        var matLookAtY = new THREE.Matrix4().lookAt(this.sphere.position, xzPos, new Vector3(0,1,0));
+        var matLookAtYInv = (new THREE.Matrix4).getInverse(matLookAtY);
+
+        this.material.uniforms['uLookAtMatrix'].value = matLookAtYInv.multiply(matLookAt);
+        this.material.uniforms['uLookAtMatrixYInv'].value = matLookAtYInv;
 
         var xyRot = xzPos.angleTo(new THREE.Vector3(0,0,1));
-        if(xzPos.x < 0) {
+        if(xzPos.x > 0) {
             xyRot *= -1;
         }
 
@@ -118,8 +125,15 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
         }
 
         this.material.uniforms['yRotation'].value = yRot;
-        this.material.uniforms['xzRotation'].value = xyRot;
+        this.material.uniforms['xzRotation'].value = 0.0; //xyRot;
 
+        var rotMatY = new Matrix4();
+        rotMatY.makeRotationAxis(new Vector3(0,1,0), Math.PI/2);
+
+        var newPos = xzPos.clone();
+        newPos.applyMatrix4(rotMatY);
+
+        console.log( THREE.Math.radToDeg(newPos.angleTo(this.mappingPos)) );
         console.log( THREE.Math.radToDeg(xyRot));
 
         // try to recalculate euler orientation from mat4
@@ -140,7 +154,7 @@ export class WorldCustomShader implements WorldModel, UpdateableWorld {
         return (delta) => {
             self.sphere.rotation.y += 0.00 * delta
 
-
+            this.updateMappingPosition(this.camera.position);
 
            /* let curvature = self.getCurvature();
             curvature += 0.1 * delta * (maximize ? 1 : -1);

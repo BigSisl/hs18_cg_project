@@ -12,9 +12,10 @@ export class SimpleWorldModel implements WorldModel {
         var material = new THREE.MeshPhongMaterial({ color: 0x0000FF });
         this.sphere = new THREE.Mesh(geometry, material);
 
-        this.sphere.position.set(0, 0, 0)
-        this.sphere.castShadow = true
-        this.sphere.receiveShadow = true
+        this.sphere.position.set(0, 0, 0);
+        this.sphere.castShadow = true;
+        this.sphere.receiveShadow = true;
+        this.sphere.visible = false;
         scene.add(this.sphere);
     }
 
@@ -30,11 +31,11 @@ export class SimpleWorldModel implements WorldModel {
         if (this.material == null) {
             this.loadTexture();
         }
-        this.scene.add(this.sphere);
+        this.sphere.visible = true;
     }
 
     unload() {
-        this.scene.remove(this.sphere);
+        this.sphere.visible = false;
     }
 
     update = (() => {
